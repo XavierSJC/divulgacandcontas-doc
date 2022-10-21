@@ -20,3 +20,12 @@ https://divulgacandcontas.tse.jus.br/divulga/rest/v1/eleicao/ordinarias
 # Informações sobre os anos eleitorais disponíveis
 https://divulgacandcontas.tse.jus.br/divulga/rest/v1/eleicao/anos-eleitorais
 ###
+
+POST https://divulgacandcontas.tse.jus.br/divulga/rest/v1/doador-fornecedor/consulta/2040602022 HTTP/1.1
+content-type: application/json
+
+{
+    "idEleicao": 2040602022,
+    "nome": "FACEBOOK SERVICOS ONLINE DO BRASIL LTDA.",
+    "cpfCnpj": ""
+}
