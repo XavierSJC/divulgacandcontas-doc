@@ -11,8 +11,10 @@ basePath: "/divulga/rest/v1"
 tags:
 - name: Eleições
   description: "Lista de eleições disponíveis para consulta"
-- name: eleicoes2020
-  description: "Eleições municipais de 2020"
+- name: Dados da eleição
+  description: "Informações sobre a eleição, cargos, candidatos, etc"
+- name: Dados da candidatura
+  description: "Informações sobre o candidato, prestações de contas, prestadores de serrviço, etc."
 schemes:
 - https
 paths:
@@ -87,21 +89,82 @@ paths:
         
         "404":
             description: "não encontrado"
-  /eleicao/listar/municipios/2030402020/{municipio}/cargos:
+  /eleicao/ufs:
     get:
       tags:
-      - "eleicoes2020"
-      summary: "Cargos no município"
-      description: "Lista de cargos em disputa no município"
+      - "Eleições"
+      summary: "Lista de siglas para Unidade Federativa"
+      description: "Lista todos as Unidades Federativas"
+      operationId: listaUFs
+      produces:
+      - "application/json"  
+      responses:
+        "202":
+          description: "OK"
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                sigla:
+                  type: string
+                nome:
+                  type: string
+                siglaSuperior:
+                  type: string
+        "404":
+            description: "não encontrado"
+  /eleicao/ufs/{siglaUF}/municipios:
+    get:
+      tags:
+      - "Eleições"
+      summary: "Lista de siglas para municipios por Unidade Federativa"
+      description: "Lista todos os municipios por Unidades Federativas"
+      operationId: listaMunicipios
+      produces:
+      - "application/json"  
+      parameters:
+      - name: siglaUF
+        in: path
+        description: "Sigla da Unidade Federativa"
+        required: true
+        type: string
+      responses:
+        "202":
+          description: "OK"
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                sigla:
+                  type: string
+                nome:
+                  type: string
+                siglaSuperior:
+                  type: string
+        "404":
+            description: "não encontrado"
+  /eleicao/listar/municipios/{idEleicao}/{siglaBusca}/cargos:
+    get:
+      tags:
+      - "Dados da eleição"
+      summary: "Cargo"
+      description: "Lista de cargos em disputa por eleição"
       operationId: listaCargos
       produces:
       - "application/json"
       parameters:
-      - name: municipio
+      - name: idEleicao
         in: path
-        description: "Código do município"
+        description: "Código da eleição"
         required: true
         type: integer
+      - name: siglaBusca
+        in: path
+        description: "Código do município, estado ou BR para cargo federal"
+        required: true
+        type: string
       responses:
         "200":
           description: "OK"
@@ -139,19 +202,144 @@ paths:
                   $ref: "#/definitions/Cargo"
         "404":
           description: "não encontrado"
-  /prestador/consulta/2030402020/2020/{municipio}/{cargo}/90/90/{candidato}:
+  /candidatura/listar/{anoEleitoral}/{siglaBusca}/{idEleicao}/{cargo}/candidatos:
     get:
       tags:
-      - "eleicoes2020"
+        - Dados da eleição
+        summary: "Candidatos"
+        description: "Lista de todos os candidatos na eleição especificada"
+        operationId: "listaCandidatos"
+        produces:
+        - "application/json"
+        parameters:
+        - name: anoEleitoral
+          in: path
+          description: "ano da eleição"
+          required: true
+          type: integer        
+        - name: siglaBusca
+          in: path
+          description: "Código do município, estado ou BR para cargo federal"
+          required: true
+          type: string
+        - name: idEleicao
+          in: path
+          description: "Código da eleição"
+          required: true
+          type: integer          
+        - name: cargo
+          in: path
+          description: "Código do cargo"
+          required: true
+          type: integer
+        responses:
+          "200":
+            description: "OK"
+            schema:
+              type: object
+              properties:
+                unidadeEleitoral:
+                  type: object
+                cargo:
+                  type: object
+                candidatos:
+                  type: array
+                  items:
+                    $ref: "#/definitions/Candidato"
+          "404":
+            description: "não encontrado"
+  /doador-fornecedor/consulta/{idEleicao}:
+    post:
+      tags:
+      - "Dados da eleição"
+      summary: "Busca doadores ou fornecedores"
+      description: "Busca doadores ou fornecedores por nome ou CPF/CNPJ"
+      operationId: listaFornecedor
+      produces:
+      - "application/json"
+      parameters:
+      - name: idEleicao
+        in: path
+        description: "id da eleição"
+        required: true
+        type: integer      
+      - name: idDoadorFornecedor
+        in: body
+        description: "id da eleição"
+        schema:
+          type: object
+          required:
+            - idEleicao
+          properties:
+            idEleicao:
+              type: string
+            nome:
+              type: string
+            cpfCnpj:
+              type: string     
+      responses:
+        "200":
+          description: "OK"
+      
+  /candidatura/buscar/{anoEleitoral}/{siglaBusca}/{idEleicao}/candidato/{candidato}:
+    get:
+      tags:
+      - "Dados da candidatura"
+      summary: Candidato
+      description: "Informações sobre o candidato"
+      operationId: consultaCandidato
+      produces:
+      - "application/json"
+      parameters:
+      - name: anoEleitoral
+        in: path
+        description: "ano da eleição"
+        required: true
+        type: integer
+      - name: siglaBusca
+        in: path
+        description: "Código do município, estado ou BR para cargo federal"
+        required: true
+        type: string
+      - name: idEleicao
+        in: path
+        description: "código da eleição"
+        required: true
+        type: integer
+      - name: candidato
+        in: path
+        description: "Código do candidato"
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Candidato" 
+  /prestador/consulta/{idEleicao}/{anoEleitoral}/{siglaBusca}/{cargo}/90/90/{candidato}:
+    get:
+      tags:
+      - "Dados da candidatura"
       summary: Prestador
       description: "Informações sobre o prestador de contas"
       operationId: consultaPrestador
       produces:
       - "application/json"
       parameters:
-      - name: municipio
+      - name: idEleicao
         in: path
-        description: "Código do município"
+        description: "Código da eleição"
+        required: true
+        type: integer
+      - name: anoEleitoral
+        in: path
+        description: "ano da eleição"
+        required: true
+        type: integer
+      - name: siglaBusca
+        in: path
+        description: "ódigo do município, estado ou BR para cargo federal"
         required: true
         type: integer
       - name: cargo
@@ -506,68 +694,6 @@ paths:
                 format: nullable            
         "404":
           description: "não encontrado"
-  /candidatura/listar/2020/{municipio}/2030402020/{cargo}/candidatos:
-    get:
-      tags:
-      - eleicoes2020
-      summary: "Candidatos no município"
-      description: "Lista de todos os candidatos nas eleições de 2020 no município especificado"
-      operationId: "listaCandidatosPorMunicipio"
-      produces:
-      - "application/json"
-      parameters:
-      - name: municipio
-        in: path
-        description: "Código do município"
-        required: true
-        type: integer
-      - name: cargo
-        in: path
-        description: "Código do cargo"
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            type: object
-            properties:
-              unidadeEleitoral:
-                type: object
-              cargo:
-                type: object
-              candidatos:
-                type: array
-                items:
-                  $ref: "#/definitions/Candidato"
-        "404":
-          description: "não encontrado"
-  /candidatura/buscar/2020/{municipio}/2030402020/candidato/{candidato}:
-    get:
-      tags:
-      - "eleicoes2020"
-      summary: Candidato
-      description: "Informações sobre o candidato"
-      operationId: consultaCandidato
-      produces:
-      - "application/json"
-      parameters:
-      - name: municipio
-        in: path
-        description: "Código do município"
-        required: true
-        type: integer
-      - name: candidato
-        in: path
-        description: "Código do candidato"
-        required: true
-        type: integer
-        format: int64
-      responses:
-        "200":
-          description: "OK"
-          schema:
-            $ref: "#/definitions/Candidato" 
 definitions:
   Candidato:
     type: "object"
