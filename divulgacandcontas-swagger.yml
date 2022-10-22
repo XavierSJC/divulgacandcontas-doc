@@ -165,6 +165,11 @@ paths:
         description: "Código do município, estado ou BR para cargo federal"
         required: true
         type: string
+      - name: siglaBusca
+        in: path
+        description: "Código do município, estado ou BR para cargo federal"
+        required: true
+        type: string
       responses:
         "200":
           description: "OK"
@@ -205,49 +210,49 @@ paths:
   /candidatura/listar/{anoEleitoral}/{siglaBusca}/{idEleicao}/{cargo}/candidatos:
     get:
       tags:
-        - Dados da eleição
-        summary: "Candidatos"
-        description: "Lista de todos os candidatos na eleição especificada"
-        operationId: "listaCandidatos"
-        produces:
-        - "application/json"
-        parameters:
-        - name: anoEleitoral
-          in: path
-          description: "ano da eleição"
-          required: true
-          type: integer        
-        - name: siglaBusca
-          in: path
-          description: "Código do município, estado ou BR para cargo federal"
-          required: true
-          type: string
-        - name: idEleicao
-          in: path
-          description: "Código da eleição"
-          required: true
-          type: integer          
-        - name: cargo
-          in: path
-          description: "Código do cargo"
-          required: true
-          type: integer
-        responses:
-          "200":
-            description: "OK"
-            schema:
-              type: object
-              properties:
-                unidadeEleitoral:
-                  type: object
-                cargo:
-                  type: object
-                candidatos:
-                  type: array
-                  items:
-                    $ref: "#/definitions/Candidato"
-          "404":
-            description: "não encontrado"
+      - Dados da eleição
+      summary: "Candidatos"
+      description: "Lista de todos os candidatos na eleição especificada"
+      operationId: "listaCandidatos"
+      produces:
+      - "application/json"
+      parameters:
+      - name: anoEleitoral
+        in: path
+        description: "ano da eleição"
+        required: true
+        type: integer        
+      - name: siglaBusca
+        in: path
+        description: "Código do município, estado ou BR para cargo federal"
+        required: true
+        type: string
+      - name: idEleicao
+        in: path
+        description: "Código da eleição"
+        required: true
+        type: integer          
+      - name: cargo
+        in: path
+        description: "Código do cargo"
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: "OK"
+          schema:
+            type: object
+            properties:
+              unidadeEleitoral:
+                type: object
+              cargo:
+                type: object
+              candidatos:
+                type: array
+                items:
+                  $ref: "#/definitions/Candidato"
+        "404":
+          description: "não encontrado"
   /doador-fornecedor/consulta/{idEleicao}:
     post:
       tags:
