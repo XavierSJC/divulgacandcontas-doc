@@ -168,11 +168,6 @@ paths:
           description: Código do município, estado ou BR para cargo federal
           required: true
           type: string
-        - name: siglaBusca
-          in: path
-          description: Código do município, estado ou BR para cargo federal
-          required: true
-          type: string
       responses:
         '200':
           description: OK
